@@ -548,32 +548,13 @@ function enforceToggles() {
     if (pfHint) pfHint.remove();
   }
 
-  // PT: cannot disable if monthly gross > 21000; auto-off if annual gross < 2.5L
+  // PT: always user-controllable
   const ptToggle = document.getElementById('togglePT');
   const ptItem = ptToggle.closest('.toggle-switch-item');
   const ptHint = ptItem.querySelector('.toggle-hint');
   if (ptHint) ptHint.remove();
-
-  if (gross < 250000) {
-    ptToggle.checked = false;
-    ptToggle.disabled = true;
-    ptItem.classList.add('disabled');
-    const hint = document.createElement('span');
-    hint.className = 'toggle-hint';
-    hint.textContent = '(₹0 — gross < ₹2.5L)';
-    ptItem.appendChild(hint);
-  } else if (monthlyGross > 21000) {
-    ptToggle.checked = true;
-    ptToggle.disabled = true;
-    ptItem.classList.add('disabled');
-    const hint = document.createElement('span');
-    hint.className = 'toggle-hint';
-    hint.textContent = '(mandatory — gross > ₹21K)';
-    ptItem.appendChild(hint);
-  } else {
-    ptToggle.disabled = false;
-    ptItem.classList.remove('disabled');
-  }
+  ptToggle.disabled = false;
+  ptItem.classList.remove('disabled');
 
   // Show/hide PT employer toggle based on PT being active
   const ptEmployerItem = document.getElementById('ptEmployerItem');
