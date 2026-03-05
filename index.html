@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CTC Salary Structure Calculator</title>
+<style>
+  :root {
+    --bg: #f5f7fa;
+    --card: #ffffff;
+    --border: #e2e8f0;
+    --text: #1a202c;
+    --text-secondary: #64748b;
+    --blue: #3b82f6;
+    --blue-light: #eff6ff;
+    --green: #10b981;
+    --green-light: #ecfdf5;
+    --red: #ef4444;
+    --red-light: #fef2f2;
+    --orange: #f59e0b;
+    --orange-light: #fffbeb;
+    --purple: #8b5cf6;
+    --purple-light: #f5f3ff;
+    --radius: 10px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; }
+
+  .container { max-width: 1200px; margin: 0 auto; padding: 24px 16px; }
+
+  h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 4px; }
+  .subtitle { color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 24px; }
+
+  /* Compliance Banner */
+  .compliance-banner {
+    border-radius: var(--radius); padding: 12px 20px; margin-bottom: 16px;
+    font-size: 0.85rem; display: flex; align-items: center; gap: 10px;
+  }
+  .compliance-banner.compliant { background: var(--green-light); border: 1.5px solid var(--green); color: #065f46; }
+  .compliance-banner.non-compliant { background: var(--orange-light); border: 1.5px solid var(--orange); color: #92400e; }
+  .compliance-banner .badge {
+    font-size: 0.7rem; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    text-transform: uppercase; letter-spacing: 0.05em; flex-shrink: 0;
+  }
+  .compliance-banner.compliant .badge { background: var(--green); color: white; }
+  .compliance-banner.non-compliant .badge { background: var(--orange); color: white; }
+  .compliance-banner .detail { font-size: 0.75rem; color: var(--text-secondary); margin-top: 2px; }
+
+  /* Input Section */
+  .input-section {
+    background: var(--card); border-radius: var(--radius); padding: 20px 24px;
+    box-shadow: var(--shadow); margin-bottom: 20px;
+    display: flex; flex-wrap: wrap; gap: 16px; align-items: end;
+  }
+  .input-group { display: flex; flex-direction: column; gap: 4px; }
+  .input-group label { font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; }
+  .input-group input, .input-group select {
+    padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 8px;
+    font-size: 1rem; outline: none; transition: border-color 0.2s;
+  }
+  .input-group input:focus, .input-group select:focus { border-color: var(--blue); }
+  .ctc-input { font-size: 1.25rem !important; font-weight: 600; width: 220px; }
+  .min-basic-input { width: 130px; }
+
+  .toggle-group { display: flex; border: 1.5px solid var(--border); border-radius: 8px; overflow: hidden; height: 42px; }
+  .toggle-btn {
+    padding: 0 16px; border: none; background: var(--card); cursor: pointer;
+    font-size: 0.875rem; font-weight: 500; color: var(--text-secondary); transition: all 0.2s;
+  }
+  .toggle-btn.active { background: var(--blue); color: white; }
+
+  /* Preset Cards */
+  .presets { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 20px; }
+  .preset-card {
+    background: var(--card); border: 2px solid var(--border); border-radius: var(--radius);
+    padding: 16px; cursor: pointer; transition: all 0.2s; box-shadow: var(--shadow);
+  }
+  .preset-card:hover { border-color: var(--blue); transform: translateY(-1px); }
+  .preset-card.active { border-color: var(--blue); background: var(--blue-light); }
+  .preset-card h3 { font-size: 0.85rem; font-weight: 600; margin-bottom: 2px; }
+  .preset-card p { font-size: 0.7rem; color: var(--text-secondary); }
+  .preset-card .preset-icon { font-size: 1.25rem; margin-bottom: 6px; }
+  .preset-card .preset-tag {
+    display: inline-block; font-size: 0.6rem; font-weight: 600; padding: 1px 6px;
+    border-radius: 3px; margin-top: 4px; text-transform: uppercase;
+  }
+  .preset-tag.compliant { background: var(--green-light); color: #065f46; }
+  .preset-tag.non-compliant { background: var(--orange-light); color: #92400e; }
+
+  /* Sliders */
+  .sliders-section {
+    background: var(--card); border-radius: var(--radius); padding: 20px 24px;
+    box-shadow: var(--shadow); margin-bottom: 20px;
+  }
+  .sliders-section h2 { font-size: 1rem; font-weight: 600; margin-bottom: 16px; }
+  .slider-row { display: flex; align-items: center; gap: 16px; margin-bottom: 12px; }
+  .slider-label { width: 160px; font-size: 0.875rem; font-weight: 500; flex-shrink: 0; }
+  .slider-row input[type="range"] { flex: 1; accent-color: var(--blue); height: 6px; }
+  .slider-value { width: 50px; text-align: right; font-weight: 600; font-size: 0.875rem; color: var(--blue); }
+  .slider-note { font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px; }
+  .slider-warning { font-size: 0.75rem; color: var(--orange); font-weight: 500; margin-top: 4px; }
+
+  /* Toggles */
+  .toggles-section {
+    background: var(--card); border-radius: var(--radius); padding: 16px 24px;
+    box-shadow: var(--shadow); margin-bottom: 20px;
+    display: flex; flex-wrap: wrap; gap: 20px; align-items: center;
+  }
+  .toggles-section .section-label { font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; }
+  .toggle-switch-item { display: flex; align-items: center; gap: 8px; }
+  .toggle-switch-item label { font-size: 0.85rem; font-weight: 500; cursor: pointer; user-select: none; }
+  .toggle-switch { position: relative; width: 40px; height: 22px; flex-shrink: 0; }
+  .toggle-switch input { opacity: 0; width: 0; height: 0; }
+  .toggle-switch .slider {
+    position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+    background: #cbd5e1; border-radius: 22px; transition: 0.2s;
+  }
+  .toggle-switch .slider:before {
+    content: ''; position: absolute; height: 16px; width: 16px; left: 3px; bottom: 3px;
+    background: white; border-radius: 50%; transition: 0.2s;
+  }
+  .toggle-switch input:checked + .slider { background: var(--blue); }
+  .toggle-switch input:checked + .slider:before { transform: translateX(18px); }
+  .toggle-switch input:disabled + .slider { background: #94a3b8; cursor: not-allowed; opacity: 0.6; }
+  .toggle-switch-item.disabled label { opacity: 0.5; cursor: not-allowed; }
+  .toggle-switch-item .toggle-hint { font-size: 0.65rem; color: var(--text-secondary); margin-left: 2px; }
+
+  /* Breakdown */
+  .breakdown-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+  @media (max-width: 768px) { .breakdown-grid { grid-template-columns: 1fr; } }
+
+  .breakdown-card {
+    background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;
+  }
+  .breakdown-card h2 {
+    font-size: 0.9rem; font-weight: 600; padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .breakdown-card h2.earnings { background: var(--green-light); color: #065f46; }
+  .breakdown-card h2.deductions { background: var(--red-light); color: #991b1b; }
+  .breakdown-card h2.employer { background: var(--blue-light); color: #1e40af; }
+  .breakdown-card h2.summary { background: var(--purple-light); color: #5b21b6; }
+
+  .breakdown-row {
+    display: flex; justify-content: space-between; padding: 10px 20px;
+    font-size: 0.875rem; border-bottom: 1px solid #f1f5f9;
+  }
+  .breakdown-row:last-child { border-bottom: none; }
+  .breakdown-row.total { font-weight: 700; background: #f8fafc; }
+  .breakdown-row.wage-highlight { background: #fffbeb; }
+  .breakdown-row .label { color: var(--text-secondary); }
+  .breakdown-row .value { font-weight: 600; font-variant-numeric: tabular-nums; }
+  .breakdown-row .note { font-size: 0.7rem; color: var(--text-secondary); margin-left: 4px; }
+  .breakdown-row .note.warn { color: var(--orange); }
+
+  .highlight-box {
+    background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow);
+    padding: 20px 24px; margin-bottom: 20px; text-align: center;
+  }
+  .highlight-box .big-number { font-size: 2rem; font-weight: 700; color: var(--green); }
+  .highlight-box .big-label { font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; }
+
+  /* Comparison Table */
+  .comparison-section {
+    background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow);
+    overflow-x: auto; margin-bottom: 20px;
+  }
+  .comparison-section h2 { font-size: 1rem; font-weight: 600; padding: 14px 20px; border-bottom: 1px solid var(--border); }
+  .comparison-table { width: 100%; border-collapse: collapse; font-size: 0.825rem; }
+  .comparison-table th {
+    padding: 10px 16px; text-align: right; font-weight: 600;
+    background: #f8fafc; border-bottom: 2px solid var(--border);
+    position: sticky; top: 0;
+  }
+  .comparison-table th:first-child { text-align: left; }
+  .comparison-table td { padding: 8px 16px; text-align: right; border-bottom: 1px solid #f1f5f9; }
+  .comparison-table td:first-child { text-align: left; color: var(--text-secondary); }
+  .comparison-table tr.total-row { font-weight: 700; background: #f8fafc; }
+  .comparison-table tr.highlight-row { background: var(--green-light); }
+  .comparison-table tr.wage-row { background: var(--orange-light); }
+  .comparison-table .active-col { background: var(--blue-light); }
+
+  /* Tax Comparison */
+  .tax-section {
+    background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow);
+    padding: 20px 24px; margin-bottom: 20px;
+  }
+  .tax-section h2 { font-size: 1rem; font-weight: 600; margin-bottom: 16px; }
+  .tax-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 768px) { .tax-grid { grid-template-columns: 1fr; } }
+  .tax-card { border: 1.5px solid var(--border); border-radius: 8px; padding: 16px; }
+  .tax-card h3 { font-size: 0.875rem; font-weight: 600; margin-bottom: 8px; }
+  .tax-card .tax-amount { font-size: 1.5rem; font-weight: 700; }
+  .tax-card .tax-monthly { font-size: 0.8rem; color: var(--text-secondary); }
+  .tax-card.better { border-color: var(--green); background: var(--green-light); }
+  .tax-card .tax-detail { font-size: 0.75rem; color: var(--text-secondary); margin-top: 6px; }
+
+  .footer { text-align: center; padding: 20px; font-size: 0.75rem; color: var(--text-secondary); }
+  .footer a { color: var(--blue); text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>CTC Salary Structure Calculator</h1>
+  <p class="subtitle">New Labour Codes (Nov 2025) compliant — PF, ESI, Gratuity, Professional Tax, Income Tax (FY 2025-26)</p>
+
+  <!-- Presets -->
+  <div class="presets" id="presets">
+    <div class="preset-card" data-preset="compliant_balanced" onclick="selectPreset('compliant_balanced')">
+      <div class="preset-icon">⚖️</div>
+      <h3>Balanced</h3>
+      <p>Basic 50% of Gross, HRA 40% of Basic</p>
+      <span class="preset-tag compliant">Compliant</span>
+    </div>
+    <div class="preset-card" data-preset="compliant_hra" onclick="selectPreset('compliant_hra')">
+      <div class="preset-icon">🏠</div>
+      <h3>HRA Focused</h3>
+      <p>Basic 50%, HRA 50% of Basic for old regime</p>
+      <span class="preset-tag compliant">Compliant</span>
+    </div>
+    <div class="preset-card" data-preset="pf_max" onclick="selectPreset('pf_max')">
+      <div class="preset-icon">🏦</div>
+      <h3>PF Maximized</h3>
+      <p>Basic 65% of Gross, maximize retirement</p>
+      <span class="preset-tag compliant">Compliant</span>
+    </div>
+    <div class="preset-card active" data-preset="max_takehome" onclick="selectPreset('max_takehome')">
+      <div class="preset-icon">💰</div>
+      <h3>Max Take-Home</h3>
+      <p>Optimized for highest in-hand salary</p>
+      <span class="preset-tag compliant">Compliant</span>
+    </div>
+    <div class="preset-card" data-preset="min_basic" onclick="selectPreset('min_basic')">
+      <div class="preset-icon">📊</div>
+      <h3>Minimum Compliant</h3>
+      <p>Basic exactly 50%, maximize allowances</p>
+      <span class="preset-tag compliant">Compliant</span>
+    </div>
+    <div class="preset-card" data-preset="custom" onclick="selectPreset('custom')">
+      <div class="preset-icon">🎛️</div>
+      <h3>Custom</h3>
+      <p>Adjust sliders manually</p>
+    </div>
+  </div>
+
+  <!-- Input -->
+  <div class="input-section">
+    <div class="input-group">
+      <label id="ctcLabel">Annual CTC (₹)</label>
+      <input type="text" class="ctc-input" id="ctcInput" placeholder="6,00,000" value="6,00,000">
+    </div>
+    <div class="input-group">
+      <label>Input Mode</label>
+      <div class="toggle-group">
+        <button class="toggle-btn active" data-ctcmode="annual" onclick="setCTCMode('annual')">Annual CTC</button>
+        <button class="toggle-btn" data-ctcmode="monthly" onclick="setCTCMode('monthly')">Monthly CTC</button>
+        <button class="toggle-btn" data-ctcmode="net" onclick="setCTCMode('net')">Net In-Hand</button>
+      </div>
+    </div>
+    <div class="input-group">
+      <label>State</label>
+      <select id="stateSelect">
+        <option value="punjab" selected>Punjab (PT: ₹2,400)</option>
+        <option value="delhi">Delhi (PT: ₹0)</option>
+        <option value="maharashtra">Maharashtra (PT: ₹2,500)</option>
+        <option value="karnataka">Karnataka (PT: ₹2,400)</option>
+        <option value="west_bengal">West Bengal (PT: ₹2,500)</option>
+        <option value="tamil_nadu">Tamil Nadu (PT: ₹2,500)</option>
+        <option value="andhra_pradesh">Andhra Pradesh (PT: ₹2,500)</option>
+        <option value="telangana">Telangana (PT: ₹2,500)</option>
+        <option value="gujarat">Gujarat (PT: ₹2,500)</option>
+        <option value="rajasthan">Rajasthan (PT: ₹2,500)</option>
+        <option value="kerala">Kerala (PT: ₹2,500)</option>
+        <option value="madhya_pradesh">Madhya Pradesh (PT: ₹2,500)</option>
+        <option value="other">Other (PT: ₹2,400)</option>
+      </select>
+    </div>
+    <div class="input-group">
+      <label>View</label>
+      <div class="toggle-group">
+        <button class="toggle-btn active" data-view="monthly" onclick="setView('monthly')">Monthly</button>
+        <button class="toggle-btn" data-view="annual" onclick="setView('annual')">Annual</button>
+      </div>
+    </div>
+    <div class="input-group" style="justify-content: end;">
+      <button onclick="exportCSV()" style="padding:10px 18px; border:1.5px solid var(--border); border-radius:8px; background:var(--card); cursor:pointer; font-size:0.85rem; font-weight:500; color:var(--text); transition:all 0.2s;" onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='var(--border)'">Export CSV</button>
+    </div>
+  </div>
+
+  <!-- Sliders -->
+  <div class="sliders-section" id="slidersSection">
+    <h2>Structure Sliders</h2>
+    <div class="slider-row">
+      <span class="slider-label">Min Basic (₹/mo)</span>
+      <input type="text" class="min-basic-input" id="minBasicInput" placeholder="None" value="" style="flex:1; max-width:160px; padding:6px 10px; border:1.5px solid var(--border); border-radius:6px; font-size:0.875rem;">
+    </div>
+    <div class="slider-row">
+      <span class="slider-label">Basic % of Gross</span>
+      <input type="range" id="basicSlider" min="15" max="80" value="50" oninput="onSliderChange()">
+      <span class="slider-value" id="basicSliderVal">50%</span>
+    </div>
+    <div id="basicSliderWarning" class="slider-warning" style="display:none;"></div>
+    <div class="slider-row">
+      <span class="slider-label">HRA % of Basic</span>
+      <input type="range" id="hraSlider" min="0" max="100" value="40" oninput="onSliderChange()">
+      <span class="slider-value" id="hraSliderVal">40%</span>
+    </div>
+    <div class="slider-note">
+      CA is auto-calculated as Gross - Basic - HRA. New Labour Codes require Basic ≥ 50% of Gross.
+    </div>
+    <!-- Statutory Toggles -->
+    <div class="toggles-section" style="margin-top: 16px; margin-bottom: 0; box-shadow: none; padding: 12px 0 0 0; border-top: 1px solid var(--border); background: transparent;">
+      <span class="section-label">Include in CTC</span>
+      <div class="toggle-switch-item">
+        <label for="togglePF">Provident Fund</label>
+        <label class="toggle-switch"><input type="checkbox" id="togglePF" checked onchange="onToggleChange()"><span class="slider"></span></label>
+      </div>
+      <div class="toggle-switch-item">
+        <label for="toggleGratuity">Gratuity</label>
+        <label class="toggle-switch"><input type="checkbox" id="toggleGratuity" onchange="onToggleChange()"><span class="slider"></span></label>
+      </div>
+      <div class="toggle-switch-item">
+        <label for="togglePT">Professional Tax</label>
+        <label class="toggle-switch"><input type="checkbox" id="togglePT" checked onchange="onToggleChange()"><span class="slider"></span></label>
+      </div>
+      <div class="toggle-switch-item" id="ptEmployerItem" style="display:none;">
+        <label for="togglePTEmployer">PT paid by Employer</label>
+        <label class="toggle-switch"><input type="checkbox" id="togglePTEmployer" onchange="render()"><span class="slider"></span></label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Take-Home Highlight -->
+  <div class="highlight-box">
+    <div class="big-label">Estimated Net Take-Home</div>
+    <div class="big-number" id="takeHomeHighlight">-</div>
+    <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px;" id="takeHomeSub"></div>
+  </div>
+
+  <!-- Breakdown -->
+  <div class="breakdown-grid">
+    <div class="breakdown-card">
+      <h2 class="earnings">Earnings</h2>
+      <div id="earningsRows"></div>
+    </div>
+    <div class="breakdown-card">
+      <h2 class="deductions">Employee Deductions</h2>
+      <div id="deductionsRows"></div>
+    </div>
+    <div class="breakdown-card">
+      <h2 class="employer">Employer Contributions (in CTC)</h2>
+      <div id="employerRows"></div>
+    </div>
+    <div class="breakdown-card">
+      <h2 class="summary">Summary</h2>
+      <div id="summaryRows"></div>
+    </div>
+  </div>
+
+  <!-- Tax Comparison -->
+  <div class="tax-section">
+    <h2>Income Tax Comparison (Estimated Annual)</h2>
+    <div class="tax-grid">
+      <div class="tax-card" id="newRegimeCard">
+        <h3>New Regime (FY 2025-26)</h3>
+        <div class="tax-amount" id="newRegimeTax">-</div>
+        <div class="tax-monthly" id="newRegimeTaxMonthly"></div>
+        <div class="tax-detail" id="newRegimeDetail"></div>
+      </div>
+      <div class="tax-card" id="oldRegimeCard">
+        <h3>Old Regime</h3>
+        <div class="tax-amount" id="oldRegimeTax">-</div>
+        <div class="tax-monthly" id="oldRegimeTaxMonthly"></div>
+        <div class="tax-detail" id="oldRegimeDetail"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Comparison Table -->
+  <div class="comparison-section">
+    <h2>All Presets Comparison</h2>
+    <table class="comparison-table" id="comparisonTable"></table>
+  </div>
+
+  <!-- Compliance Banner -->
+  <div class="compliance-banner compliant" id="complianceBanner">
+    <span class="badge">Compliant</span>
+    <div>
+      <div id="complianceText">Structure meets the 50% wage rule under New Labour Codes (2025).</div>
+      <div class="detail" id="complianceDetail"></div>
+    </div>
+  </div>
+
+  <div class="footer">
+    Estimates only — consult a CA for exact tax planning. Updated for <b>New Labour Codes (Nov 2025)</b> &amp; FY 2025-26 tax slabs.<br>
+    Wage Code: Basic ≥ 50% of Gross. PF capped at ₹15,000 wages/month. ESI if wages ≤ ₹21,000/month (on wages, not gross). Gratuity on wages.
+  </div>
+</div>
+
+<script>
+// ─── State ───
+let currentView = 'monthly';
+let currentPreset = 'max_takehome';
+let annualCTC = 600000;
+let ctcMode = 'annual'; // 'annual' or 'monthly' — how the user enters CTC
+
+const PT_MAP = {
+  punjab: 2400, delhi: 0, maharashtra: 2500, karnataka: 2400, west_bengal: 2500,
+  tamil_nadu: 2500, andhra_pradesh: 2500, telangana: 2500,
+  gujarat: 2500, rajasthan: 2500, kerala: 2500, madhya_pradesh: 2500, other: 2400,
+};
+
+// Presets: basicPctGross = Basic as % of Gross, hraPctBasic = HRA as % of Basic
+const PRESETS = {
+  compliant_balanced: { basicPctGross: 50, hraPctBasic: 40 },
+  compliant_hra:      { basicPctGross: 50, hraPctBasic: 50 },
+  pf_max:             { basicPctGross: 65, hraPctBasic: 30 },
+  min_basic:          { basicPctGross: 50, hraPctBasic: 25 },
+  max_takehome:       { basicPctGross: 50, hraPctBasic: 0 },  // dynamic, overridden by findMaxTakeHome
+  custom:             { basicPctGross: 50, hraPctBasic: 40 },
+};
+
+// ─── Formatting (Indian ₹XX,XX,XXX) ───
+function fmt(n) {
+  n = Math.round(n);
+  const neg = n < 0; if (neg) n = -n;
+  let s = n.toString();
+  if (s.length > 3) {
+    const last3 = s.slice(-3);
+    let rest = s.slice(0, -3);
+    const parts = [];
+    while (rest.length > 2) { parts.unshift(rest.slice(-2)); rest = rest.slice(0, -2); }
+    if (rest) parts.unshift(rest);
+    s = parts.join(',') + ',' + last3;
+  }
+  return (neg ? '-' : '') + '₹' + s;
+}
+
+function div(annual) { return currentView === 'monthly' ? annual / 12 : annual; }
+function fmtV(annual) { return fmt(div(annual)); }
+
+// ─── Tax: New Regime FY 2025-26 ───
+function calcTaxNew(taxableIncome) {
+  const std = 75000;
+  let income = Math.max(0, taxableIncome - std);
+  const slabs = [
+    [400000, 0], [400000, 0.05], [400000, 0.10],
+    [400000, 0.15], [400000, 0.20], [400000, 0.25], [Infinity, 0.30],
+  ];
+  let tax = 0, remaining = income;
+  for (const [limit, rate] of slabs) {
+    const taxable = Math.min(remaining, limit);
+    tax += taxable * rate;
+    remaining -= taxable;
+    if (remaining <= 0) break;
+  }
+  // Section 87A rebate: if taxable income (after std ded) ≤ 12L, rebate up to ₹60,000
+  if (income <= 1200000) tax = Math.max(0, tax - 60000);
+  // Marginal relief: if income just above 12L, tax should not exceed income above 12L
+  if (income > 1200000 && income <= 1260000) {
+    const normalTax = tax;
+    const marginalTax = income - 1200000;
+    tax = Math.min(normalTax, marginalTax);
+  }
+  const cess = tax * 0.04;
+  return { tax, cess, total: tax + cess, stdDeduction: std };
+}
+
+// ─── Tax: Old Regime ───
+function calcTaxOld(taxableIncome, hraExemption, employeePF) {
+  const std = 50000;
+  const sec80c = Math.min(150000, employeePF);
+  let income = Math.max(0, taxableIncome - std - hraExemption - sec80c);
+  const slabs = [
+    [250000, 0], [250000, 0.05], [500000, 0.20], [Infinity, 0.30],
+  ];
+  let tax = 0, remaining = income;
+  for (const [limit, rate] of slabs) {
+    const taxable = Math.min(remaining, limit);
+    tax += taxable * rate;
+    remaining -= taxable;
+    if (remaining <= 0) break;
+  }
+  if (income <= 500000) tax = Math.max(0, tax - 12500);
+  const cess = tax * 0.04;
+  return { tax, cess, total: tax + cess, stdDeduction: std, hraExemption, sec80c };
+}
+
+// ─── HRA Exemption (Old Regime) ───
+function calcHRAExemption(basicAnnual, hraAnnual, isMetro) {
+  const rentPaid = hraAnnual * 0.8; // assume rent ≈ 80% of HRA
+  const a = hraAnnual;
+  const b = (isMetro ? 0.50 : 0.40) * basicAnnual;
+  const c = Math.max(0, rentPaid - 0.10 * basicAnnual);
+  return Math.min(a, b, c);
+}
+
+// ─── Toggle state helpers ───
+function getToggles() {
+  return {
+    pf: document.getElementById('togglePF').checked,
+    gratuity: document.getElementById('toggleGratuity').checked,
+    pt: document.getElementById('togglePT').checked,
+    ptEmployer: document.getElementById('togglePTEmployer').checked,
+  };
+}
+
+function getMinBasicMonthly() {
+  const val = parseCTC(document.getElementById('minBasicInput').value);
+  return val > 0 ? val : 0;
+}
+
+function onToggleChange() {
+  enforceToggles();
+  render();
+}
+
+function enforceToggles() {
+  const state = document.getElementById('stateSelect').value;
+  const params = currentPreset === 'custom'
+    ? { basicPctGross: +document.getElementById('basicSlider').value, hraPctBasic: +document.getElementById('hraSlider').value }
+    : getPresetParams(currentPreset);
+
+  // Quick calc to get gross & basic for constraint checks.
+  // Calculate WITH PF off to check if basic could exceed ₹15K (breaking chicken-and-egg).
+  function quickCalcBasic(pfOn) {
+    let g = annualCTC * 0.85;
+    for (let i = 0; i < 15; i++) {
+      const b = g * (params.basicPctGross / 100);
+      const sw = Math.max(b, g * 0.5);
+      const mw = sw / 12;
+      const pfw = Math.min(mw, 15000);
+      const epf = pfOn ? pfw * 0.12 * 12 : 0;
+      const grat = document.getElementById('toggleGratuity').checked ? sw * 0.0481 : 0;
+      const esiA = mw <= 21000;
+      const eESI = esiA ? Math.min(mw, 21000) * 0.0325 * 12 : 0;
+      const ng = annualCTC - epf - grat - eESI;
+      if (Math.abs(ng - g) < 1) { g = ng; break; }
+      g = ng;
+    }
+    return { monthlyBasic: g * (params.basicPctGross / 100) / 12, monthlyGross: g / 12, gross: g };
+  }
+  // If basic > ₹15K even with PF on, or > ₹15K with PF off → PF is optional
+  const withPFOn = quickCalcBasic(true);
+  const withPFOff = quickCalcBasic(false);
+  const pfMandatory = withPFOn.monthlyBasic <= 15000 && withPFOff.monthlyBasic <= 15000;
+  // Use current toggle state for gross/PT calculations
+  const currentPF = document.getElementById('togglePF').checked;
+  const calc = currentPF ? withPFOn : withPFOff;
+  const monthlyGross = calc.monthlyGross;
+  const gross = calc.gross;
+
+  // PF: mandatory only if basic ≤ ₹15K in both PF-on and PF-off scenarios
+  const pfToggle = document.getElementById('togglePF');
+  const pfItem = pfToggle.closest('.toggle-switch-item');
+  const pfHint = pfItem.querySelector('.toggle-hint');
+  if (pfMandatory) {
+    pfToggle.checked = true;
+    pfToggle.disabled = true;
+    pfItem.classList.add('disabled');
+    if (!pfHint) {
+      const hint = document.createElement('span');
+      hint.className = 'toggle-hint';
+      hint.textContent = '(mandatory — Basic ≤ ₹15K)';
+      pfItem.appendChild(hint);
+    }
+  } else {
+    pfToggle.disabled = false;
+    pfItem.classList.remove('disabled');
+    if (pfHint) pfHint.remove();
+  }
+
+  // PT: cannot disable if monthly gross > 21000; auto-off if annual gross < 2.5L
+  const ptToggle = document.getElementById('togglePT');
+  const ptItem = ptToggle.closest('.toggle-switch-item');
+  const ptHint = ptItem.querySelector('.toggle-hint');
+  if (ptHint) ptHint.remove();
+
+  if (gross < 250000) {
+    ptToggle.checked = false;
+    ptToggle.disabled = true;
+    ptItem.classList.add('disabled');
+    const hint = document.createElement('span');
+    hint.className = 'toggle-hint';
+    hint.textContent = '(₹0 — gross < ₹2.5L)';
+    ptItem.appendChild(hint);
+  } else if (monthlyGross > 21000) {
+    ptToggle.checked = true;
+    ptToggle.disabled = true;
+    ptItem.classList.add('disabled');
+    const hint = document.createElement('span');
+    hint.className = 'toggle-hint';
+    hint.textContent = '(mandatory — gross > ₹21K)';
+    ptItem.appendChild(hint);
+  } else {
+    ptToggle.disabled = false;
+    ptItem.classList.remove('disabled');
+  }
+
+  // Show/hide PT employer toggle based on PT being active
+  const ptEmployerItem = document.getElementById('ptEmployerItem');
+  ptEmployerItem.style.display = ptToggle.checked ? 'flex' : 'none';
+}
+
+// ─── Core Calculation (New Labour Code aware) ───
+function calcStructure(annualCTC, basicPctGross, hraPctBasic, state, toggleOverride) {
+  const toggles = toggleOverride || getToggles();
+  const minBasicMonthly = getMinBasicMonthly();
+  const minBasicAnnual = minBasicMonthly * 12;
+
+  // Iteratively solve: CTC = Gross + Employer PF + Employer ESI + Gratuity + (PT if employer-paid)
+  // Under New Labour Codes: statutory "wages" = max(Basic, 50% of Gross)
+  // PF on wages (capped ₹15K/month), Gratuity on wages, ESI on wages if ≤ ₹21K/month
+
+  let gross = annualCTC * 0.85; // initial guess
+
+  for (let i = 0; i < 30; i++) {
+    let basic = gross * (basicPctGross / 100);
+    if (minBasicAnnual > 0 && basic < minBasicAnnual) basic = minBasicAnnual;
+    const statutoryWages = Math.max(basic, gross * 0.5);
+    const monthlyWages = statutoryWages / 12;
+    const pfWages = Math.min(monthlyWages, 15000);
+    const employerPF = toggles.pf ? pfWages * 0.12 * 12 : 0;
+    const gratuity = toggles.gratuity ? statutoryWages * 0.0481 : 0;
+    const esiApplicable = monthlyWages <= 21000;
+    const esiWages = Math.min(monthlyWages, 21000);
+    const employerESI = esiApplicable ? esiWages * 0.0325 * 12 : 0;
+    const ptVal = (toggles.pt && gross >= 250000) ? (PT_MAP[state] || 2400) : 0;
+    const employerPT = toggles.ptEmployer ? ptVal : 0;
+
+    const newGross = annualCTC - employerPF - gratuity - employerESI - employerPT;
+    if (Math.abs(newGross - gross) < 1) { gross = newGross; break; }
+    gross = newGross;
+  }
+
+  let basic = gross * (basicPctGross / 100);
+  if (minBasicAnnual > 0 && basic < minBasicAnnual) basic = minBasicAnnual;
+  const hra = basic * (hraPctBasic / 100);
+  const ca = gross - basic - hra;
+
+  // Statutory wages per new wage code
+  const statutoryWages = Math.max(basic, gross * 0.5);
+  const wageCodeCompliant = basic >= gross * 0.5 - 1; // allow ₹1 rounding
+  const basicPctActual = (basic / gross * 100);
+
+  const monthlyWages = statutoryWages / 12;
+  const pfWages = Math.min(monthlyWages, 15000);
+  const pfCapped = monthlyWages > 15000;
+
+  // ESI: eligibility checked on wages (not gross), contributions on wages capped at ₹21K
+  const esiApplicable = monthlyWages <= 21000;
+  const esiWages = Math.min(monthlyWages, 21000);
+
+  // Employer costs
+  const employerPF = toggles.pf ? pfWages * 0.12 * 12 : 0;
+  const gratuity = toggles.gratuity ? statutoryWages * 0.0481 : 0;
+  const employerESI = esiApplicable ? esiWages * 0.0325 * 12 : 0;
+
+  // Employee deductions
+  const employeePF = toggles.pf ? pfWages * 0.12 * 12 : 0;
+  const employeeESI = esiApplicable ? esiWages * 0.0075 * 12 : 0;
+  const ptTotal = (toggles.pt && gross >= 250000) ? (PT_MAP[state] || 2400) : 0;
+  const ptEmployerPaid = toggles.ptEmployer;
+  const employerPT = ptEmployerPaid ? ptTotal : 0;
+  const employeePT = ptEmployerPaid ? 0 : ptTotal;
+
+  // Tax
+  const taxableGross = gross;
+  const newTax = calcTaxNew(taxableGross);
+
+  const isMetro = ['delhi', 'maharashtra', 'karnataka', 'west_bengal'].includes(state);
+  const hraExemption = calcHRAExemption(basic, hra, isMetro);
+  const oldTax = calcTaxOld(taxableGross, hraExemption, employeePF);
+
+  const betterTax = Math.min(newTax.total, oldTax.total);
+  const totalDeductions = employeePF + employeeESI + employeePT + betterTax;
+  const netTakeHome = gross - totalDeductions;
+
+  return {
+    gross, basic, hra, ca,
+    statutoryWages, wageCodeCompliant, basicPctActual,
+    employerPF, gratuity, employerESI, esiApplicable, esiWages, pfCapped,
+    employeePF, employeeESI, ptTotal, employeePT, employerPT, ptEmployerPaid,
+    newTax, oldTax, betterTax,
+    totalDeductions, netTakeHome,
+    ctcCheck: gross + employerPF + gratuity + employerESI + employerPT,
+    toggles, minBasicMonthly,
+  };
+}
+
+// ─── Optimize for max take-home (compliant) ───
+function findMaxTakeHome(annualCTC, state) {
+  const toggles = getToggles();
+  let bestBasic = 50, bestHRA = 0, bestNet = -Infinity, bestToggles = { ...toggles };
+
+  // Strategy 1: Basic at 50% (minimum compliant), sweep HRA, PF on
+  for (let hraPct = 0; hraPct <= 80; hraPct += 1) {
+    const s = calcStructure(annualCTC, 50, hraPct, state, { ...toggles, pf: true });
+    if (s.netTakeHome > bestNet) {
+      bestNet = s.netTakeHome;
+      bestBasic = 50; bestHRA = hraPct;
+      bestToggles = { ...toggles, pf: true };
+    }
+  }
+
+  // Strategy 2: Push basic above ₹15K/month to make PF optional, then disable PF.
+  // Find the minimum basic% of gross that puts monthly basic > ₹15,000.
+  // We need basic/12 > 15000, so basic > 180000.
+  // basic = gross * pct/100, gross ≈ CTC * ~0.85-0.95, so try a range of basicPct.
+  for (let basicPct = 50; basicPct <= 80; basicPct += 1) {
+    for (let hraPct = 0; hraPct <= 80; hraPct += 5) {
+      const s = calcStructure(annualCTC, basicPct, hraPct, state, { ...toggles, pf: false });
+      // Only valid if monthly basic actually exceeds ₹15K (PF optional)
+      if (s.basic / 12 > 15000 && s.netTakeHome > bestNet) {
+        bestNet = s.netTakeHome;
+        bestBasic = basicPct; bestHRA = hraPct;
+        bestToggles = { ...toggles, pf: false };
+      }
+    }
+  }
+  // Fine-tune HRA for the best basic% found in strategy 2 (if it won)
+  if (!bestToggles.pf) {
+    for (let hraPct = 0; hraPct <= 80; hraPct += 1) {
+      const s = calcStructure(annualCTC, bestBasic, hraPct, state, { ...toggles, pf: false });
+      if (s.basic / 12 > 15000 && s.netTakeHome > bestNet) {
+        bestNet = s.netTakeHome;
+        bestHRA = hraPct;
+      }
+    }
+  }
+
+  return { basicPctGross: bestBasic, hraPctBasic: bestHRA, skipPF: !bestToggles.pf };
+}
+
+// ─── Get preset params ───
+function getPresetParams(preset) {
+  if (preset === 'max_takehome') {
+    const state = document.getElementById('stateSelect').value;
+    const result = findMaxTakeHome(annualCTC, state);
+    return result;
+  }
+  return { ...PRESETS[preset] };
+}
+
+// ─── Render ───
+function makeRow(label, value, note, isTotal, extraClass) {
+  const cls = (isTotal ? ' total' : '') + (extraClass ? ' ' + extraClass : '');
+  return `<div class="breakdown-row${cls}">
+    <span class="label">${label}${note ? `<span class="note${note.startsWith('⚠') ? ' warn' : ''}">${note}</span>` : ''}</span>
+    <span class="value">${value}</span>
+  </div>`;
+}
+
+function render() {
+  const state = document.getElementById('stateSelect').value;
+  const params = currentPreset === 'custom'
+    ? { basicPctGross: +document.getElementById('basicSlider').value, hraPctBasic: +document.getElementById('hraSlider').value }
+    : getPresetParams(currentPreset);
+
+  // Update sliders to match preset (before enforceToggles so it sees correct values)
+  if (currentPreset !== 'custom') {
+    document.getElementById('basicSlider').value = params.basicPctGross;
+    document.getElementById('hraSlider').value = params.hraPctBasic;
+    document.getElementById('basicSliderVal').textContent = params.basicPctGross + '%';
+    document.getElementById('hraSliderVal').textContent = params.hraPctBasic + '%';
+  }
+
+  // Enforce toggle constraints (after sliders updated so it sees correct basic%)
+  enforceToggles();
+
+  // Slider warning
+  const sliderWarn = document.getElementById('basicSliderWarning');
+  const minBm = getMinBasicMonthly();
+  if (currentPreset === 'custom' && params.basicPctGross < 50) {
+    sliderWarn.style.display = 'block';
+    sliderWarn.textContent = `⚠ Basic at ${params.basicPctGross}% is below the 50% minimum required by New Labour Codes. Statutory calculations will use 50% of Gross as the wage base.`;
+  } else if (minBm > 0) {
+    // Show info if min basic floor is active
+    sliderWarn.style.display = 'block';
+    sliderWarn.style.color = 'var(--blue)';
+    sliderWarn.textContent = `Min Basic floor: ${fmt(minBm)}/month. Basic will not go below this regardless of slider/preset.`;
+  } else {
+    sliderWarn.style.display = 'none';
+    sliderWarn.style.color = '';
+  }
+
+  const s = calcStructure(annualCTC, params.basicPctGross, params.hraPctBasic, state);
+
+  // Compliance banner
+  const banner = document.getElementById('complianceBanner');
+  const compText = document.getElementById('complianceText');
+  const compDetail = document.getElementById('complianceDetail');
+  if (s.wageCodeCompliant) {
+    banner.className = 'compliance-banner compliant';
+    banner.querySelector('.badge').textContent = 'Compliant';
+    compText.textContent = 'Structure meets the 50% wage rule under New Labour Codes (Nov 2025).';
+    compDetail.textContent = `Basic is ${Math.round(s.basicPctActual)}% of Gross. Statutory wages = ${fmtV(s.statutoryWages)}. PF/Gratuity calculated on Basic.`;
+  } else {
+    banner.className = 'compliance-banner non-compliant';
+    banner.querySelector('.badge').textContent = 'Non-Compliant';
+    compText.textContent = `Basic is ${Math.round(s.basicPctActual)}% of Gross — below the 50% minimum under New Labour Codes.`;
+    compDetail.textContent = `Statutory wages deemed as 50% of Gross = ${fmtV(s.statutoryWages)} (higher than Basic ${fmtV(s.basic)}). PF/Gratuity calculated on deemed wages.`;
+  }
+
+  // Take-home highlight
+  document.getElementById('takeHomeHighlight').textContent = fmtV(s.netTakeHome);
+  const otherView = currentView === 'monthly' ? fmt(s.netTakeHome) + '/year' : fmt(s.netTakeHome / 12) + '/month';
+  document.getElementById('takeHomeSub').textContent = `${otherView} • Using ${s.newTax.total <= s.oldTax.total ? 'New' : 'Old'} Regime`;
+
+  // Earnings
+  const wageNote = !s.wageCodeCompliant ? '⚠ below 50% wage floor' : '';
+  const minNote = s.minBasicMonthly > 0 && s.basic / 12 <= s.minBasicMonthly + 1 ? ' (min floor applied)' : '';
+  document.getElementById('earningsRows').innerHTML =
+    makeRow('Basic', fmtV(s.basic), `(${Math.round(s.basicPctActual)}% of Gross)` + minNote + (wageNote ? ' ' + wageNote : ''), false, !s.wageCodeCompliant ? 'wage-highlight' : '') +
+    makeRow('H.R.A', fmtV(s.hra), `(${params.hraPctBasic}% of Basic)`) +
+    makeRow('C.A / Special Allowance', fmtV(s.ca), '') +
+    makeRow('Gross Salary', fmtV(s.gross), '', true) +
+    (!s.wageCodeCompliant ? makeRow('Deemed Statutory Wages', fmtV(s.statutoryWages), '(50% of Gross — wage code floor)', false, 'wage-highlight') : '');
+
+  // Deductions
+  document.getElementById('deductionsRows').innerHTML =
+    makeRow('Employee PF', fmtV(s.employeePF),
+      (s.pfCapped ? '(capped at ₹15K wages)' : '') +
+      (!s.wageCodeCompliant ? ' (on deemed wages)' : '')) +
+    (s.esiApplicable ? makeRow('Employee ESI', fmtV(s.employeeESI), '(0.75% of wages)') : '') +
+    (!s.ptEmployerPaid && s.ptTotal > 0 ? makeRow('Professional Tax', fmtV(s.employeePT), '') : '') +
+    makeRow('Income Tax (est.)', fmtV(s.betterTax), `(${s.newTax.total <= s.oldTax.total ? 'New' : 'Old'} Regime)`) +
+    makeRow('Total Deductions', fmtV(s.totalDeductions), '', true);
+
+  // Employer
+  const wageBase = !s.wageCodeCompliant ? 'deemed wages' : 'Basic';
+  document.getElementById('employerRows').innerHTML =
+    makeRow('Employer PF', fmtV(s.employerPF), `(12% of ${wageBase}${s.pfCapped ? ', capped' : ''})`) +
+    (s.esiApplicable ? makeRow('Employer ESI', fmtV(s.employerESI), '(3.25% of wages)') : '') +
+    makeRow('Gratuity', fmtV(s.gratuity), `(4.81% of ${wageBase})`) +
+    (s.ptEmployerPaid && s.ptTotal > 0 ? makeRow('Professional Tax', fmtV(s.employerPT), '(employer-paid)') : '') +
+    makeRow('Total Employer Cost', fmtV(s.employerPF + s.employerESI + s.gratuity + s.employerPT), '', true);
+
+  // Summary
+  document.getElementById('summaryRows').innerHTML =
+    makeRow('CTC', fmtV(annualCTC), '') +
+    makeRow('Gross Salary', fmtV(s.gross), '') +
+    makeRow('Total Deductions', fmtV(s.totalDeductions), '') +
+    makeRow('Net Take-Home', fmtV(s.netTakeHome), '', true);
+
+  // Tax comparison
+  const newCard = document.getElementById('newRegimeCard');
+  const oldCard = document.getElementById('oldRegimeCard');
+  newCard.classList.toggle('better', s.newTax.total <= s.oldTax.total);
+  oldCard.classList.toggle('better', s.oldTax.total < s.newTax.total);
+
+  document.getElementById('newRegimeTax').textContent = fmt(s.newTax.total);
+  document.getElementById('newRegimeTaxMonthly').textContent = fmt(s.newTax.total / 12) + '/month';
+  document.getElementById('newRegimeDetail').textContent = `Std deduction: ${fmt(s.newTax.stdDeduction)}`;
+
+  document.getElementById('oldRegimeTax').textContent = fmt(s.oldTax.total);
+  document.getElementById('oldRegimeTaxMonthly').textContent = fmt(s.oldTax.total / 12) + '/month';
+  document.getElementById('oldRegimeDetail').textContent =
+    `Std: ${fmt(s.oldTax.stdDeduction)} • HRA exempt: ${fmt(s.oldTax.hraExemption)} • 80C: ${fmt(s.oldTax.sec80c)}`;
+
+  // Comparison table
+  renderComparison(state);
+}
+
+function renderComparison(state) {
+  const presetKeys = ['compliant_balanced', 'compliant_hra', 'max_takehome', 'pf_max', 'min_basic'];
+  const presetNames = ['Balanced', 'HRA Focus', 'Max Take-Home', 'PF Max', 'Min Compliant'];
+  const baseToggles = getToggles();
+  const results = presetKeys.map(p => {
+    const params = getPresetParams(p);
+    // Each preset gets its own toggle state for comparison purposes
+    if (p === 'max_takehome' && params.skipPF) {
+      return calcStructure(annualCTC, params.basicPctGross, params.hraPctBasic, state, { ...baseToggles, pf: false });
+    }
+    // For other presets, use PF = true (default/mandatory for most salary ranges)
+    return calcStructure(annualCTC, params.basicPctGross, params.hraPctBasic, state, { ...baseToggles, pf: true });
+  });
+
+  const rows = [
+    { label: 'CTC', val: () => annualCTC, static: true, total: true },
+    { label: 'Basic', key: 'basic' },
+    { label: 'H.R.A', key: 'hra' },
+    { label: 'C.A', key: 'ca' },
+    { label: 'Gross', key: 'gross', total: true },
+    { label: 'Statutory Wages', key: 'statutoryWages', wage: true },
+    { label: 'Employer PF', key: 'employerPF' },
+    { label: 'Employer ESI', key: 'employerESI' },
+    { label: 'Gratuity', key: 'gratuity' },
+    { label: 'Employee PF', key: 'employeePF' },
+    { label: 'Employee ESI', key: 'employeeESI' },
+    { label: 'Prof. Tax (employee)', key: 'employeePT' },
+    { label: 'Prof. Tax (employer)', key: 'employerPT' },
+    { label: 'Tax (best regime)', key: 'betterTax' },
+    { label: 'Net Take-Home', key: 'netTakeHome', highlight: true },
+  ];
+
+  const activeIdx = presetKeys.indexOf(currentPreset);
+
+  let html = '<thead><tr><th>Component</th>';
+  presetNames.forEach((n, i) => {
+    html += `<th class="${i === activeIdx ? 'active-col' : ''}">${n}</th>`;
+  });
+  html += '</tr></thead><tbody>';
+
+  rows.forEach(row => {
+    const cls = row.highlight ? 'highlight-row' : (row.total ? 'total-row' : (row.wage ? 'wage-row' : ''));
+    html += `<tr class="${cls}"><td>${row.label}</td>`;
+    results.forEach((r, i) => {
+      const val = row.static ? row.val() : r[row.key];
+      html += `<td class="${i === activeIdx ? 'active-col' : ''}">${fmtV(val)}</td>`;
+    });
+    html += '</tr>';
+  });
+
+  // Compliance row
+  html += '<tr class="total-row"><td>Wage Code</td>';
+  results.forEach((r, i) => {
+    const cls = i === activeIdx ? 'active-col' : '';
+    html += `<td class="${cls}" style="color: ${r.wageCodeCompliant ? 'var(--green)' : 'var(--orange)'}; font-size: 0.75rem;">${r.wageCodeCompliant ? '✓ Compliant' : '⚠ Non-Compliant'}</td>`;
+  });
+  html += '</tr>';
+
+  html += '</tbody>';
+  document.getElementById('comparisonTable').innerHTML = html;
+}
+
+// ─── Event Handlers ───
+function selectPreset(preset) {
+  currentPreset = preset;
+  document.querySelectorAll('.preset-card').forEach(c => c.classList.toggle('active', c.dataset.preset === preset));
+  // Apply initial PF recommendation for max_takehome preset
+  if (preset === 'max_takehome') {
+    const params = getPresetParams(preset);
+    if (params.skipPF) {
+      document.getElementById('togglePF').checked = false;
+    }
+  }
+  render();
+}
+
+function setView(view) {
+  currentView = view;
+  document.querySelectorAll('[data-view]').forEach(b => b.classList.toggle('active', b.dataset.view === view));
+  render();
+}
+
+function setCTCMode(mode) {
+  const input = document.getElementById('ctcInput');
+  const oldMode = ctcMode;
+  ctcMode = mode;
+  document.querySelectorAll('[data-ctcmode]').forEach(b => b.classList.toggle('active', b.dataset.ctcmode === mode));
+  const labels = { annual: 'Annual CTC (₹)', monthly: 'Monthly CTC (₹)', net: 'Monthly Net In-Hand (₹)' };
+  document.getElementById('ctcLabel').textContent = labels[mode];
+
+  // Convert displayed value to new mode
+  if (annualCTC > 0) {
+    let displayVal;
+    if (mode === 'annual') {
+      displayVal = annualCTC;
+    } else if (mode === 'monthly') {
+      displayVal = Math.round(annualCTC / 12);
+    } else { // net
+      // Show current net take-home as the input value
+      const state = document.getElementById('stateSelect').value;
+      const params = currentPreset === 'custom'
+        ? { basicPctGross: +document.getElementById('basicSlider').value, hraPctBasic: +document.getElementById('hraSlider').value }
+        : getPresetParams(currentPreset);
+      const s = calcStructure(annualCTC, params.basicPctGross, params.hraPctBasic, state);
+      displayVal = Math.round(s.netTakeHome / 12);
+    }
+    input.value = formatCTCInput(String(displayVal));
+  }
+  updateCTCFromInput();
+}
+
+// Reverse solve: given target monthly net, find annual CTC
+function solveCTCFromNet(targetMonthlyNet, state) {
+  const targetAnnualNet = targetMonthlyNet * 12;
+  // Binary search: CTC must be >= net, and practically <= 5x net
+  let lo = targetAnnualNet, hi = targetAnnualNet * 5;
+  const params = currentPreset === 'custom'
+    ? { basicPctGross: +document.getElementById('basicSlider').value, hraPctBasic: +document.getElementById('hraSlider').value }
+    : getPresetParams(currentPreset);
+
+  for (let i = 0; i < 50; i++) {
+    const mid = (lo + hi) / 2;
+    const s = calcStructure(mid, params.basicPctGross, params.hraPctBasic, state);
+    if (Math.abs(s.netTakeHome - targetAnnualNet) < 10) return Math.round(mid);
+    if (s.netTakeHome < targetAnnualNet) lo = mid;
+    else hi = mid;
+  }
+  return Math.round((lo + hi) / 2);
+}
+
+function updateCTCFromInput() {
+  const raw = parseCTC(document.getElementById('ctcInput').value);
+  if (raw <= 0) return;
+  if (ctcMode === 'annual') {
+    annualCTC = raw;
+  } else if (ctcMode === 'monthly') {
+    annualCTC = raw * 12;
+  } else { // net in-hand
+    const state = document.getElementById('stateSelect').value;
+    annualCTC = solveCTCFromNet(raw, state);
+  }
+  if (annualCTC > 0) render();
+}
+
+function onSliderChange() {
+  document.getElementById('basicSliderVal').textContent = document.getElementById('basicSlider').value + '%';
+  document.getElementById('hraSliderVal').textContent = document.getElementById('hraSlider').value + '%';
+  // Auto-switch to custom when user manually moves sliders
+  if (currentPreset !== 'custom') {
+    currentPreset = 'custom';
+    document.querySelectorAll('.preset-card').forEach(c => c.classList.toggle('active', c.dataset.preset === 'custom'));
+  }
+  render();
+}
+
+function parseCTC(str) {
+  return parseInt(str.replace(/[₹,\s]/g, ''), 10) || 0;
+}
+
+function formatCTCInput(val) {
+  const num = parseInt(val.replace(/[^0-9]/g, ''), 10);
+  if (isNaN(num)) return '';
+  return num.toLocaleString('en-IN');
+}
+
+document.getElementById('ctcInput').addEventListener('input', function(e) {
+  const pos = e.target.selectionStart;
+  const oldLen = e.target.value.length;
+  e.target.value = formatCTCInput(e.target.value);
+  const newLen = e.target.value.length;
+  e.target.setSelectionRange(pos + (newLen - oldLen), pos + (newLen - oldLen));
+  updateCTCFromInput();
+});
+
+document.getElementById('stateSelect').addEventListener('change', render);
+
+document.getElementById('minBasicInput').addEventListener('input', function(e) {
+  const pos = e.target.selectionStart;
+  const oldLen = e.target.value.length;
+  e.target.value = e.target.value === '' ? '' : formatCTCInput(e.target.value);
+  const newLen = e.target.value.length;
+  e.target.setSelectionRange(pos + (newLen - oldLen), pos + (newLen - oldLen));
+  render();
+});
+
+// ─── Export CSV ───
+function exportCSV() {
+  const state = document.getElementById('stateSelect').value;
+  const params = currentPreset === 'custom'
+    ? { basicPctGross: +document.getElementById('basicSlider').value, hraPctBasic: +document.getElementById('hraSlider').value }
+    : getPresetParams(currentPreset);
+  const s = calcStructure(annualCTC, params.basicPctGross, params.hraPctBasic, state);
+  const m = v => Math.round(v / 12);
+  const a = v => Math.round(v);
+
+  const rows = [
+    ['CTC Salary Structure Breakdown'],
+    ['Component', 'Monthly (₹)', 'Annual (₹)'],
+    [],
+    ['EARNINGS'],
+    ['Basic', m(s.basic), a(s.basic)],
+    ['H.R.A', m(s.hra), a(s.hra)],
+    ['C.A / Special Allowance', m(s.ca), a(s.ca)],
+    ['Gross Salary', m(s.gross), a(s.gross)],
+    [],
+    ['EMPLOYEE DEDUCTIONS'],
+    ['Employee PF', m(s.employeePF), a(s.employeePF)],
+    ['Employee ESI', m(s.employeeESI), a(s.employeeESI)],
+    ['Professional Tax (employee)', m(s.employeePT), a(s.employeePT)],
+    ['Income Tax (est.)', m(s.betterTax), a(s.betterTax)],
+    ['Total Deductions', m(s.employeePF + s.employeeESI + s.employeePT + s.betterTax), a(s.employeePF + s.employeeESI + s.employeePT + s.betterTax)],
+    [],
+    ['EMPLOYER CONTRIBUTIONS'],
+    ['Employer PF', m(s.employerPF), a(s.employerPF)],
+    ['Employer ESI', m(s.employerESI), a(s.employerESI)],
+    ['Gratuity', m(s.gratuity), a(s.gratuity)],
+    ['Professional Tax (employer)', m(s.employerPT), a(s.employerPT)],
+    ['Total Employer Cost', m(s.employerPF + s.employerESI + s.gratuity + s.employerPT), a(s.employerPF + s.employerESI + s.gratuity + s.employerPT)],
+    [],
+    ['SUMMARY'],
+    ['CTC', m(annualCTC), a(annualCTC)],
+    ['Gross Salary', m(s.gross), a(s.gross)],
+    ['Net Take-Home', m(s.netTakeHome), a(s.netTakeHome)],
+    [],
+    ['TAX COMPARISON'],
+    ['New Regime', m(s.newTax.total), a(s.newTax.total)],
+    ['Old Regime', m(s.oldTax.total), a(s.oldTax.total)],
+    [],
+    ['Wage Code Compliant', s.basic / s.gross >= 0.4999 ? 'Yes' : 'No'],
+    ['State', state.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())],
+    ['Preset', currentPreset.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())],
+  ];
+
+  const csv = rows.map(r => r.map(c => typeof c === 'string' && c.includes(',') ? `"${c}"` : c).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a2 = document.createElement('a');
+  a2.href = url;
+  a2.download = `salary_breakdown_${Math.round(annualCTC)}.csv`;
+  a2.click();
+  URL.revokeObjectURL(url);
+}
+
+// Init — apply skipPF for default max_takehome preset
+const initParams = getPresetParams('max_takehome');
+if (initParams.skipPF) document.getElementById('togglePF').checked = false;
+render();
+</script>
+</body>
+</html>
