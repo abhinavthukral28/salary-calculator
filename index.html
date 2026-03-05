@@ -161,25 +161,6 @@
   .highlight-box .big-number { font-size: 2rem; font-weight: 700; color: var(--green); }
   .highlight-box .big-label { font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; }
 
-  /* Comparison Table */
-  .comparison-section {
-    background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow);
-    overflow-x: auto; margin-bottom: 20px;
-  }
-  .comparison-section h2 { font-size: 1rem; font-weight: 600; padding: 14px 20px; border-bottom: 1px solid var(--border); }
-  .comparison-table { width: 100%; border-collapse: collapse; font-size: 0.825rem; }
-  .comparison-table th {
-    padding: 10px 16px; text-align: right; font-weight: 600;
-    background: #f8fafc; border-bottom: 2px solid var(--border);
-    position: sticky; top: 0;
-  }
-  .comparison-table th:first-child { text-align: left; }
-  .comparison-table td { padding: 8px 16px; text-align: right; border-bottom: 1px solid #f1f5f9; }
-  .comparison-table td:first-child { text-align: left; color: var(--text-secondary); }
-  .comparison-table tr.total-row { font-weight: 700; background: #f8fafc; }
-  .comparison-table tr.highlight-row { background: var(--green-light); }
-  .comparison-table tr.wage-row { background: var(--orange-light); }
-  .comparison-table .active-col { background: var(--blue-light); }
 
   /* Tax Comparison */
   .tax-section {
@@ -377,11 +358,6 @@
     </div>
   </div>
 
-  <!-- Comparison Table -->
-  <div class="comparison-section">
-    <h2>All Presets Comparison</h2>
-    <table class="comparison-table" id="comparisonTable"></table>
-  </div>
 
   <!-- Compliance Banner -->
   <div class="compliance-banner compliant" id="complianceBanner">
@@ -859,71 +835,8 @@ function render() {
   document.getElementById('oldRegimeDetail').textContent =
     `Std: ${fmt(s.oldTax.stdDeduction)} • HRA exempt: ${fmt(s.oldTax.hraExemption)} • 80C: ${fmt(s.oldTax.sec80c)}`;
 
-  // Comparison table
-  renderComparison(state);
 }
 
-function renderComparison(state) {
-  const presetKeys = ['compliant_balanced', 'compliant_hra', 'max_takehome', 'pf_max', 'min_basic'];
-  const presetNames = ['Balanced', 'HRA Focus', 'Max Take-Home', 'PF Max', 'Min Compliant'];
-  const baseToggles = getToggles();
-  const results = presetKeys.map(p => {
-    const params = getPresetParams(p);
-    // Each preset gets its own toggle state for comparison purposes
-    if (p === 'max_takehome' && params.skipPF) {
-      return calcStructure(annualCTC, params.basicPctGross, params.hraPctBasic, state, { ...baseToggles, pf: false });
-    }
-    // For other presets, use PF = true (default/mandatory for most salary ranges)
-    return calcStructure(annualCTC, params.basicPctGross, params.hraPctBasic, state, { ...baseToggles, pf: true });
-  });
-
-  const rows = [
-    { label: 'CTC', val: () => annualCTC, static: true, total: true },
-    { label: 'Basic', key: 'basic' },
-    { label: 'H.R.A', key: 'hra' },
-    { label: 'C.A', key: 'ca' },
-    { label: 'Gross', key: 'gross', total: true },
-    { label: 'Statutory Wages', key: 'statutoryWages', wage: true },
-    { label: 'Employer PF', key: 'employerPF' },
-    { label: 'Employer ESI', key: 'employerESI' },
-    { label: 'Gratuity', key: 'gratuity' },
-    { label: 'Employee PF', key: 'employeePF' },
-    { label: 'Employee ESI', key: 'employeeESI' },
-    { label: 'Prof. Tax (employee)', key: 'employeePT' },
-    { label: 'Prof. Tax (employer)', key: 'employerPT' },
-    { label: 'Tax (best regime)', key: 'betterTax' },
-    { label: 'Net Take-Home', key: 'netTakeHome', highlight: true },
-  ];
-
-  const activeIdx = presetKeys.indexOf(currentPreset);
-
-  let html = '<thead><tr><th>Component</th>';
-  presetNames.forEach((n, i) => {
-    html += `<th class="${i === activeIdx ? 'active-col' : ''}">${n}</th>`;
-  });
-  html += '</tr></thead><tbody>';
-
-  rows.forEach(row => {
-    const cls = row.highlight ? 'highlight-row' : (row.total ? 'total-row' : (row.wage ? 'wage-row' : ''));
-    html += `<tr class="${cls}"><td>${row.label}</td>`;
-    results.forEach((r, i) => {
-      const val = row.static ? row.val() : r[row.key];
-      html += `<td class="${i === activeIdx ? 'active-col' : ''}">${fmtV(val)}</td>`;
-    });
-    html += '</tr>';
-  });
-
-  // Compliance row
-  html += '<tr class="total-row"><td>Wage Code</td>';
-  results.forEach((r, i) => {
-    const cls = i === activeIdx ? 'active-col' : '';
-    html += `<td class="${cls}" style="color: ${r.wageCodeCompliant ? 'var(--green)' : 'var(--orange)'}; font-size: 0.75rem;">${r.wageCodeCompliant ? '✓ Compliant' : '⚠ Non-Compliant'}</td>`;
-  });
-  html += '</tr>';
-
-  html += '</tbody>';
-  document.getElementById('comparisonTable').innerHTML = html;
-}
 
 // ─── Event Handlers ───
 function selectPreset(preset) {
