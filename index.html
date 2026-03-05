@@ -264,9 +264,6 @@
         <button class="toggle-btn" data-view="annual" onclick="setView('annual')">Annual</button>
       </div>
     </div>
-    <div class="input-group" style="justify-content: end;">
-      <button onclick="exportCSV()" style="padding:10px 18px; border:1.5px solid var(--border); border-radius:8px; background:var(--card); cursor:pointer; font-size:0.85rem; font-weight:500; color:var(--text); transition:all 0.2s;" onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='var(--border)'">Export CSV</button>
-    </div>
   </div>
 
   <!-- Sliders -->
@@ -337,6 +334,10 @@
       <h2 class="summary">Summary</h2>
       <div id="summaryRows"></div>
     </div>
+  </div>
+
+  <div style="text-align: right; margin-bottom: 20px;">
+    <button onclick="exportCSV()" style="padding:10px 18px; border:1.5px solid var(--border); border-radius:8px; background:var(--card); cursor:pointer; font-size:0.85rem; font-weight:500; color:var(--text); transition:all 0.2s;" onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='var(--border)'">Export CSV</button>
   </div>
 
   <!-- Tax Comparison -->
